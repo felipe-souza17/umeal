@@ -55,11 +55,11 @@ export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
 
           {/* <div className="flex flex-wrap gap-3 text-sm">
           <div className="flex items-center gap-1 text-muted-foreground">
-            <Clock size={16} className="text-primary" />
+            <Clock size={16} className="text-foreground" />
             <span>{restaurant.deliveryTime}</span>
           </div>
           <div className="flex items-center gap-1 text-muted-foreground">
-            <Star size={16} className="fill-primary text-primary" />
+            <Star size={16} className="fill-primary text-foreground" />
             <span className="font-medium">{restaurant.rating}</span>
             <span>({restaurant.reviews})</span>
           </div>
@@ -67,7 +67,10 @@ export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
 
           {/* Address */}
           <div className="flex items-start gap-1 text-sm text-muted-foreground">
-            <MapPin size={16} className="mt-0.5 flex-shrink-0 text-primary" />
+            <MapPin
+              size={16}
+              className="mt-0.5 flex-shrink-0 text-foreground"
+            />
             <span className="line-clamp-1">
               {restaurant.address.street}, {restaurant.address.number} -{" "}
               {restaurant.address.neighborhood}, {restaurant.address.city} -{" "}
@@ -76,7 +79,7 @@ export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
           </div>
 
           {/* CTA Button */}
-          <button className="w-full rounded-lg bg-primary py-2 font-medium text-primary-foreground transition-all hover:bg-primary/90 active:scale-95">
+          <button className="w-full rounded-lg bg-primary py-2 font-medium text-foreground-foreground transition-all hover:bg-primary/90 active:scale-95">
             Ver Menu
           </button>
         </div>

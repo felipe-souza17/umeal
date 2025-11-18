@@ -70,8 +70,8 @@ export function ClientHome({ userName }: { userName: string }) {
   return (
     <div className="bg-background">
       {/* <PromoBanner /> */}
-      <div className="space-y-2">
-        <h2 className="text-3xl font-bold text-white">
+      <div className="mx-auto max-w-7xl space-y-2">
+        <h2 className="text-3xl font-bold text-foreground transition-colors">
           Fome de que hoje, {userName}?
         </h2>
         <p className="text-slate-400">
@@ -102,7 +102,7 @@ export function ClientHome({ userName }: { userName: string }) {
               onClick={() => setActiveCategory(null)}
               className={`whitespace-nowrap rounded-full px-4 py-2 font-medium transition-colors ${
                 activeCategory === null
-                  ? "bg-primary text-primary-foreground"
+                  ? "bg-primary text-foreground-foreground"
                   : "bg-card text-foreground border border-border hover:border-primary"
               }`}
             >
@@ -114,7 +114,7 @@ export function ClientHome({ userName }: { userName: string }) {
                 onClick={() => setActiveCategory(category.name)}
                 className={`whitespace-nowrap rounded-full px-4 py-2 font-medium transition-colors ${
                   activeCategory === category.name
-                    ? "bg-primary text-primary-foreground"
+                    ? "bg-primary text-foreground-foreground"
                     : "bg-card text-foreground border border-border hover:border-primary"
                 }`}
               >

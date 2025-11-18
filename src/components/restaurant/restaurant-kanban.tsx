@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { KanbanColumn } from "./kanban-column";
 import { apiRequest } from "@/services/api";
+import { toast } from "sonner";
 
 export type OrderStatus =
   | "PENDING"
@@ -76,7 +77,9 @@ export function RestaurantKanban({ restaurantId }: RestaurantKanbanProps) {
     } catch (error) {
       console.error("Erro ao atualizar status", error);
       setOrders(oldOrders);
-      alert("Não foi possível atualizar o pedido.");
+      toast.error("Erro ao atualizar status", {
+        description: "Tente novamente mais tarde.",
+      });
     }
   };
 
@@ -108,7 +111,7 @@ export function RestaurantKanban({ restaurantId }: RestaurantKanbanProps) {
         </div>
         <button
           onClick={fetchOrders}
-          className="text-sm text-primary hover:underline"
+          className="text-sm text-foreground hover:underline"
         >
           Atualizar agora
         </button>

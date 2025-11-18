@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { apiRequest } from "@/services/api";
 import { Plus, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 // Reutilizando as mesmas categorias (idealmente viriam do banco/constante compartilhada)
 const CATEGORIES = [
@@ -83,7 +84,7 @@ export function ProductDialog({ restaurantId, onSuccess }: ProductDialogProps) {
       onSuccess();
     } catch (error) {
       console.error("Erro ao criar produto", error);
-      alert("Erro ao adicionar produto.");
+      toast.error("Erro ao criar produto. Tente novamente.");
     } finally {
       setIsLoading(false);
     }
@@ -92,12 +93,12 @@ export function ProductDialog({ restaurantId, onSuccess }: ProductDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-primary text-white hover:bg-primary/90">
+        <Button className="bg-primary text-foreground hover:bg-primary/90">
           <Plus className="w-4 h-4 mr-2" />
           Novo Item
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-card border-slate-900 text-white sm:max-w-[425px]">
+      <DialogContent className="bg-card border-slate-900 text-foreground sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Adicionar ao Cardápio</DialogTitle>
           <DialogDescription className="text-slate-400">
@@ -162,7 +163,7 @@ export function ProductDialog({ restaurantId, onSuccess }: ProductDialogProps) {
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-primary hover:bg-primary/90 text-white"
+              className="w-full bg-primary hover:bg-primary/90 text-foreground"
             >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Salvar Produto

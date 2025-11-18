@@ -6,6 +6,7 @@ import { ProductDialog } from "./product-dialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Trash2, Edit2, UtensilsCrossed } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface Product {
   id: number;
@@ -40,14 +41,17 @@ export function RestaurantMenu({ restaurantId }: RestaurantMenuProps) {
   }, [restaurantId]);
 
   const handleDelete = async (productId: number) => {
-    if (!confirm("Tem certeza que deseja remover este item?")) return;
+    const promise = apiRequest(`products/${productId}`, { method: "DELETE" });
 
-    try {
-      await apiRequest(`/products/${productId}`, { method: "DELETE" });
-      setProducts(products.filter((p) => p.id !== productId));
-    } catch (error) {
-      alert("Erro ao deletar produto");
-    }
+    toast.promise(promise, {
+      loading: "Removendo item do cardápio...",
+      success: (data) => {
+        setProducts(products.filter((p) => p.id !== productId));
+        return "Produto removido com sucesso!";
+      },
+      error: "Erro ao deletar produto. Tente novamente.",
+      duration: 3000,
+    });
   };
 
   if (isLoading)
@@ -68,7 +72,7 @@ export function RestaurantMenu({ restaurantId }: RestaurantMenuProps) {
       {products.length === 0 ? (
         <div className="text-center py-20 bg-card rounded-xl border border-dashed border-slate-900">
           <UtensilsCrossed className="mx-auto h-12 w-12 text-slate-500 mb-4" />
-          <h3 className="text-lg font-medium text-white">
+          <h3 className="text-lg font-medium text-foreground">
             Seu cardápio está vazio
           </h3>
           <p className="text-slate-400 mb-6">
@@ -85,10 +89,10 @@ export function RestaurantMenu({ restaurantId }: RestaurantMenuProps) {
               <CardContent className="p-0">
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-bold text-lg text-white truncate pr-2">
+                    <h3 className="font-bold text-lg text-foreground truncate pr-2">
                       {product.name}
                     </h3>
-                    <span className="font-mono text-primary font-bold">
+                    <span className="font-mono text-foreground font-bold">
                       {new Intl.NumberFormat("pt-BR", {
                         style: "currency",
                         currency: "BRL",
@@ -104,7 +108,7 @@ export function RestaurantMenu({ restaurantId }: RestaurantMenuProps) {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 w-8 p-0 text-slate-400 hover:text-white"
+                      className="h-8 w-8 p-0 text-slate-400 hover:text-foreground"
                     >
                       <Edit2 className="h-4 w-4" />
                     </Button>

@@ -17,6 +17,7 @@ import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { apiRequest } from "@/services/api";
+import { toast } from "sonner";
 
 export default function Home() {
   const router = useRouter();
@@ -95,12 +96,15 @@ export default function Home() {
         body: JSON.stringify(payload),
       });
 
-      alert("Conta criada com sucesso! Faça login para continuar.");
+      toast.success("Conta criada com sucesso! Faça login para continuar.");
       setCurrentPage("login");
       setPassword("");
       setConfirmPassword("");
     } catch (err: any) {
       setError(err.message || "Erro ao criar conta. Tente novamente.");
+      toast.error("Falha na Configuração", {
+        description: "Erro ao criar conta. Tente novamente.",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -115,7 +119,7 @@ export default function Home() {
 
         <div className="w-full max-w-md space-y-4">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-primary mb-2">uMeal</h1>
+            <h1 className="text-4xl font-bold text-foreground mb-2">uMeal</h1>
             <p className="text-slate-400">
               Plataforma Premium de Entrega de Alimentos
             </p>
@@ -130,7 +134,7 @@ export default function Home() {
             </CardHeader>
             <CardContent className="space-y-4">
               <Button
-                className="w-full h-12 text-base bg-primary hover:bg-primary/90 text-white"
+                className="w-full h-12 text-base bg-primary hover:bg-primary/90 text-foreground"
                 onClick={() => {
                   setCurrentPage("login");
                   setError("");
@@ -172,7 +176,7 @@ export default function Home() {
               }}
               className="inline-block mb-4"
             >
-              <h1 className="text-3xl font-bold text-primary hover:opacity-80 transition-opacity">
+              <h1 className="text-3xl font-bold text-foreground hover:opacity-80 transition-opacity">
                 uMeal
               </h1>
             </button>
@@ -203,7 +207,7 @@ export default function Home() {
                     placeholder="seu@email.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500"
+                    className="bg-slate-700/50 border-slate-600 text-foreground placeholder:text-slate-500"
                     disabled={isLoading}
                   />
                 </div>
@@ -216,14 +220,14 @@ export default function Home() {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500"
+                    className="bg-slate-700/50 border-slate-600 text-foreground placeholder:text-slate-500"
                     disabled={isLoading}
                   />
                 </div>
 
                 <Button
                   type="submit"
-                  className="w-full h-12 bg-primary hover:bg-primary/90 text-white"
+                  className="w-full h-12 bg-primary hover:bg-primary/90 text-foreground"
                   disabled={isLoading}
                 >
                   {isLoading ? "Entrando..." : "Entrar"}
@@ -239,7 +243,7 @@ export default function Home() {
                 setCurrentPage("signup");
                 setError("");
               }}
-              className="text-primary hover:underline font-medium"
+              className="text-foreground hover:underline font-medium"
             >
               Criar conta
             </button>
@@ -264,7 +268,7 @@ export default function Home() {
             }}
             className="inline-block mb-4"
           >
-            <h1 className="text-3xl font-bold text-primary hover:opacity-80 transition-opacity">
+            <h1 className="text-3xl font-bold text-foreground hover:opacity-80 transition-opacity">
               uMeal
             </h1>
           </button>
@@ -290,7 +294,7 @@ export default function Home() {
                   placeholder="João Silva"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500"
+                  className="bg-slate-700/50 border-slate-600 text-foreground placeholder:text-slate-500"
                   disabled={isLoading}
                 />
               </div>
@@ -303,7 +307,7 @@ export default function Home() {
                   placeholder="seu@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500"
+                  className="bg-slate-700/50 border-slate-600 text-foreground placeholder:text-slate-500"
                   disabled={isLoading}
                 />
               </div>
@@ -316,7 +320,7 @@ export default function Home() {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500"
+                  className="bg-slate-700/50 border-slate-600 text-foreground placeholder:text-slate-500"
                   disabled={isLoading}
                 />
               </div>
@@ -329,7 +333,7 @@ export default function Home() {
                   placeholder="••••••••"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500"
+                  className="bg-slate-700/50 border-slate-600 text-foreground placeholder:text-slate-500"
                   disabled={isLoading}
                 />
               </div>
@@ -383,7 +387,7 @@ export default function Home() {
 
               <Button
                 type="submit"
-                className="w-full h-12 bg-primary hover:bg-primary/90 text-white"
+                className="w-full h-12 bg-primary hover:bg-primary/90 text-foreground"
                 disabled={isLoading}
               >
                 {isLoading ? "Criando conta..." : "Criar Conta"}
@@ -399,7 +403,7 @@ export default function Home() {
               setCurrentPage("login");
               setError("");
             }}
-            className="text-primary hover:underline font-medium"
+            className="text-foreground hover:underline font-medium"
           >
             Entrar
           </button>

@@ -4,6 +4,8 @@ import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { ClientThemeProvider } from "@/components/client-theme-provider";
 
+import { Toaster } from "sonner";
+
 import {
   Geist_Mono,
   Geist_Mono as V0_Font_Geist_Mono,
@@ -30,7 +32,10 @@ export default function RootLayout({
         className={`font-sans antialiased ${geist.className} ${geistMono.className}`}
       >
         <ClientThemeProvider>
-          <CartProvider>{children}</CartProvider>
+          <CartProvider>
+            {children}
+            <Toaster position="top-center" theme="dark" richColors />
+          </CartProvider>
         </ClientThemeProvider>
         <Analytics />
       </body>

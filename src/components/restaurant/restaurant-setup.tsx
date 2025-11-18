@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { apiRequest } from "@/services/api";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 const CATEGORIES = [
   { id: 1, name: "Japonesa" },
@@ -117,10 +118,18 @@ export function RestaurantSetup({ onSuccess }: RestaurantSetupProps) {
         body: JSON.stringify(restaurantPayload),
       });
 
+      toast.success("Restaurante Inaugurado!", {
+        description: "Você já pode cadastrar seu cardápio e receber pedidos!",
+        duration: 4000,
+      });
+
       onSuccess();
     } catch (error) {
       console.error("Erro no cadastro:", error);
-      alert("Ocorreu um erro ao salvar as informações. Tente novamente.");
+      toast.error("Falha na Configuração", {
+        description:
+          "Ocorreu um erro ao salvar as informações. Verifique os dados e o CNPJ.",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -130,7 +139,7 @@ export function RestaurantSetup({ onSuccess }: RestaurantSetupProps) {
     <div className="max-w-3xl mx-auto py-10 px-4">
       <Card className="border-slate-700 bg-slate-800/50 backdrop-blur">
         <CardHeader>
-          <CardTitle className="text-2xl text-primary">
+          <CardTitle className="text-2xl text-foreground">
             Configuração da Loja
           </CardTitle>
           <CardDescription>
@@ -140,7 +149,7 @@ export function RestaurantSetup({ onSuccess }: RestaurantSetupProps) {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-white border-b border-slate-700 pb-2">
+              <h3 className="text-lg font-semibold text-foreground border-b border-slate-700 pb-2">
                 Dados do Estabelecimento
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -186,7 +195,7 @@ export function RestaurantSetup({ onSuccess }: RestaurantSetupProps) {
 
             {/* --- Seção: Endereço --- */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-white border-b border-slate-700 pb-2">
+              <h3 className="text-lg font-semibold text-foreground border-b border-slate-700 pb-2">
                 Localização
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -205,7 +214,7 @@ export function RestaurantSetup({ onSuccess }: RestaurantSetupProps) {
                     />
                     {isSearchingCep && (
                       <div className="absolute right-3 top-2.5">
-                        <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                        <Loader2 className="h-5 w-5 animate-spin text-foreground" />
                       </div>
                     )}
                   </div>
@@ -269,7 +278,7 @@ export function RestaurantSetup({ onSuccess }: RestaurantSetupProps) {
 
             <Button
               type="submit"
-              className="w-full h-12 text-lg font-bold bg-primary hover:bg-primary/90 text-white"
+              className="w-full h-12 text-lg font-bold bg-primary hover:bg-primary/90 text-foreground"
               disabled={isLoading || isSearchingCep}
             >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

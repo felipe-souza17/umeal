@@ -31,7 +31,7 @@ const STATUS_COLORS: Record<
   },
   OUT_FOR_DELIVERY: {
     bg: "bg-primary/10",
-    text: "text-primary",
+    text: "text-foreground",
     border: "border-primary",
   },
   DELIVERED: {
@@ -86,7 +86,7 @@ export function KanbanColumn({
               {nextStatus && (
                 <button
                   onClick={() => onMoveOrder(order.id, nextStatus)}
-                  className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-secondary py-2 px-3 text-sm font-medium text-secondary-foreground transition-all hover:bg-primary hover:text-primary-foreground opacity-0 group-hover:opacity-100"
+                  className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-secondary py-2 px-3 text-sm font-medium text-secondary-foreground transition-all hover:bg-primary hover:text-foreground-foreground opacity-0 group-hover:opacity-100"
                 >
                   Mover para{" "}
                   {STATUS_COLORS[nextStatus]?.text === "text-chart-2"

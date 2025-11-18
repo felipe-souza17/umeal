@@ -78,11 +78,13 @@ export default function Dashboard() {
         <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-8">
-              <h1 className="text-2xl font-bold text-primary">uMeal</h1>
+              <h1 className="text-2xl font-bold text-foreground">uMeal</h1>
               <div className="text-sm text-slate-400">
-                Welcome,{" "}
-                <span className="text-white font-medium">{userName}</span> (
-                {translateUserRole(userRole || "")})
+                Bem-vindo(a),{" "}
+                <span className="text-foreground transition-colors font-medium">
+                  {userName}
+                </span>{" "}
+                ({translateUserRole(userRole || "")})
               </div>
             </div>
 

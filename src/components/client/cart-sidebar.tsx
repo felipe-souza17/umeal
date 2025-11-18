@@ -18,9 +18,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ShoppingBag, Trash2, Plus, Minus, Loader2 } from "lucide-react";
+import { ShoppingBag, Trash2, Plus, Minus, Loader2, Frown } from "lucide-react";
 import { apiRequest } from "@/services/api";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export function CartSidebar() {
   const {
@@ -52,7 +53,9 @@ export function CartSidebar() {
 
   const handleCheckout = async () => {
     if (!restaurantId || !selectedAddress) {
-      alert("Selecione um endereço para entrega.");
+      toast.warning("Dados incompletos", {
+        description: "Verifique os dados do pedido e tente novamente.",
+      });
       return;
     }
 
@@ -72,92 +75,108 @@ export function CartSidebar() {
         body: JSON.stringify(payload),
       });
 
-      alert("Pedido realizado com sucesso!");
+      toast.success("Pedido realizado com sucesso!");
       clearCart();
       setIsOpen(false);
       router.push("/dashboard");
     } catch (error) {
       console.error(error);
-      alert("Erro ao finalizar pedido. Tente novamente.");
+      toast.error("Erro ao realizar pedido", {
+        description: "Tente novamente mais tarde.",
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (cartCount === 0) {
-    return null;
-  }
-
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <Button className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-xl bg-primary hover:bg-primary/90 z-50 flex flex-col gap-1">
+        <Button
+          className={`fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-xl z-50 flex flex-col gap-1 transition-transform ${
+            cartCount === 0
+              ? "bg-muted text-muted-foreground opacity-70"
+              : "bg-primary hover:bg-primary/90 text-white"
+          }`}
+          disabled={cartCount === 0 && !isOpen}
+        >
           <ShoppingBag className="h-6 w-6" />
-          <span className="text-xs font-bold">{cartCount}</span>
+          {cartCount > 0 && (
+            <span className="text-xs font-bold">{cartCount}</span>
+          )}
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-md bg-slate-900 border-slate-800 text-white flex flex-col">
+
+      <SheetContent className="w-full sm:max-w-md bg-background border-border text-foreground flex flex-col p-8">
         <SheetHeader>
-          <SheetTitle className="text-white">Seu Pedido</SheetTitle>
+          <SheetTitle className="text-foreground">Seu Pedido</SheetTitle>
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto py-4 space-y-4">
-          {items.map((item) => (
-            <div
-              key={item.product.id}
-              className="flex justify-between items-center bg-slate-800/50 p-3 rounded-lg"
-            >
-              <div className="flex-1">
-                <h4 className="font-medium text-sm">{item.product.name}</h4>
-                <p className="text-xs text-slate-400">
-                  {new Intl.NumberFormat("pt-BR", {
-                    style: "currency",
-                    currency: "BRL",
-                  }).format(item.product.price)}
-                </p>
-              </div>
+          {cartCount === 0 ? (
+            <div className="text-center py-10 text-muted-foreground">
+              <Frown className="h-8 w-8 mx-auto mb-2" />
+              <p>Seu carrinho está vazio.</p>
+            </div>
+          ) : (
+            items.map((item) => (
+              <div
+                key={item.product.id}
+                className="flex justify-between items-center bg-card p-3 rounded-lg border border-border"
+              >
+                <div className="flex-1">
+                  <h4 className="font-medium text-sm">{item.product.name}</h4>
+                  <p className="text-xs text-muted-foreground">
+                    {new Intl.NumberFormat("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    }).format(item.product.price)}
+                  </p>
+                </div>
 
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 bg-slate-700 rounded-md p-1">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 bg-input/70 rounded-md p-1 border border-border">
+                    <button
+                      onClick={() => updateQuantity(item.product.id, -1)}
+                      className="p-1 hover:bg-border rounded text-foreground"
+                    >
+                      <Minus className="h-3 w-3" />
+                    </button>
+                    <span className="text-sm w-4 text-center text-foreground">
+                      {item.quantity}
+                    </span>
+                    <button
+                      onClick={() => updateQuantity(item.product.id, 1)}
+                      className="p-1 hover:bg-border rounded text-foreground"
+                    >
+                      <Plus className="h-3 w-3" />
+                    </button>
+                  </div>
                   <button
-                    onClick={() => updateQuantity(item.product.id, -1)}
-                    className="p-1 hover:bg-slate-600 rounded"
+                    onClick={() => removeFromCart(item.product.id)}
+                    className="text-red-400 hover:text-red-300"
                   >
-                    <Minus className="h-3 w-3" />
-                  </button>
-                  <span className="text-sm w-4 text-center">
-                    {item.quantity}
-                  </span>
-                  <button
-                    onClick={() => updateQuantity(item.product.id, 1)}
-                    className="p-1 hover:bg-slate-600 rounded"
-                  >
-                    <Plus className="h-3 w-3" />
+                    <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
-                <button
-                  onClick={() => removeFromCart(item.product.id)}
-                  className="text-red-400 hover:text-red-300"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
-
-        <div className="border-t border-slate-800 pt-4 space-y-4">
+        {/* Rodapé e Checkout */}
+        <div className="border-t border-border pt-4 space-y-4">
           <div className="space-y-2">
             <label className="text-sm font-medium">Endereço de Entrega</label>
-            {addresses.length > 0 ? (
+            {/* Lógica de Seleção de Endereço */}
+            {cartCount > 0 && addresses.length > 0 ? (
               <Select
                 value={selectedAddress}
                 onValueChange={setSelectedAddress}
               >
-                <SelectTrigger className="bg-slate-800 border-slate-700">
+                <SelectTrigger className="bg-card border-border">
                   <SelectValue placeholder="Selecione..." />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-slate-700 text-white">
+                <SelectContent className="bg-card border-border text-foreground">
                   {addresses.map((addr) => (
                     <SelectItem key={addr.id} value={addr.id.toString()}>
                       {addr.street}, {addr.number} - {addr.neighborhood}
@@ -165,16 +184,18 @@ export function CartSidebar() {
                   ))}
                 </SelectContent>
               </Select>
-            ) : (
+            ) : cartCount > 0 ? (
               <div className="text-sm text-yellow-500 bg-yellow-900/20 p-2 rounded">
-                Você não tem endereços cadastrados. Vá em Perfil para adicionar.
+                Você não tem endereços cadastrados.
               </div>
-            )}
+            ) : null}
           </div>
 
           <div className="flex justify-between items-center font-bold text-lg">
             <span>Total</span>
-            <span>
+            <span className="text-primary">
+              {" "}
+              {/* Mantém o total em laranja vibrante */}
               {new Intl.NumberFormat("pt-BR", {
                 style: "currency",
                 currency: "BRL",
@@ -186,7 +207,9 @@ export function CartSidebar() {
             <Button
               className="w-full h-12 bg-green-600 hover:bg-green-700 text-white font-bold"
               onClick={handleCheckout}
-              disabled={isSubmitting || addresses.length === 0}
+              disabled={
+                isSubmitting || addresses.length === 0 || cartCount === 0
+              }
             >
               {isSubmitting && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

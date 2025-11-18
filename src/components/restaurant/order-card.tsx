@@ -12,7 +12,7 @@ const STATUS_CONFIG: Record<OrderStatus, { label: string; color: string }> = {
   IN_PREPARATION: { label: "Em Prep.", color: "bg-chart-3/20 text-chart-3" },
   OUT_FOR_DELIVERY: {
     label: "Saiu para entrega",
-    color: "bg-primary/20 text-primary",
+    color: "bg-primary/20 text-foreground",
   },
   DELIVERED: { label: "Entregue", color: "bg-chart-4/20 text-chart-4" },
   CANCELLED: {
@@ -74,7 +74,7 @@ export function OrderCard({ order }: OrderCardProps) {
           <span className="text-xs font-medium text-muted-foreground">
             Total
           </span>
-          <span className="font-semibold text-primary">
+          <span className="font-semibold text-foreground">
             ${order.totalPrice.toFixed(2)}
           </span>
         </div>

@@ -7,6 +7,7 @@ import {
   useState,
   ReactNode,
 } from "react";
+import { toast } from "sonner";
 
 export interface CartItem {
   product: {
@@ -50,11 +51,19 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addToCart = (product: any, newRestaurantId: string) => {
     if (restaurantId && restaurantId !== newRestaurantId) {
-      const confirmSwitch = window.confirm(
-        "Você já tem itens de outro restaurante no carrinho. Deseja limpar o carrinho atual e iniciar um novo pedido?"
-      );
-      if (!confirmSwitch) return;
-      clearCart();
+      toast.error("Carrinho em Conflito", {
+        description:
+          "Você já tem itens de outro restaurante. Limpe o carrinho para continuar.",
+        action: {
+          label: "Limpar Carrinho",
+          onClick: () => {
+            clearCart();
+            addToCart(product, newRestaurantId);
+          },
+        },
+        duration: 5000,
+      });
+      return;
     }
 
     setRestaurantId(newRestaurantId);
@@ -66,6 +75,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
           i.product.id === product.id ? { ...i, quantity: i.quantity + 1 } : i
         );
       }
+      toast.success(`${product.name} adicionado!`, {
+        description: `Total de itens no carrinho: ${cartCount + 1}`,
+        duration: 1500,
+      });
       return [...prev, { product, quantity: 1 }];
     });
   };

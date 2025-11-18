@@ -92,11 +92,11 @@ export default function RestaurantPage() {
 
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background to-transparent p-6">
           <div className="max-w-7xl mx-auto">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
+            <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
               {restaurant.name}
             </h1>
             <div className="flex items-center gap-4 text-sm text-slate-200">
-              <span className="text-primary font-semibold">
+              <span className="text-foreground font-semibold">
                 {restaurant.categoryName || "Geral"}
               </span>
               <span>•</span>
@@ -140,10 +140,10 @@ export default function RestaurantPage() {
               <CardContent className="flex-1 p-4 flex flex-col justify-between">
                 <div>
                   <div className="flex justify-between items-start gap-2">
-                    <h3 className="font-bold text-base text-white">
+                    <h3 className="font-bold text-base text-foreground">
                       {product.name}
                     </h3>
-                    <span className="text-primary font-bold whitespace-nowrap">
+                    <span className="text-foreground font-bold whitespace-nowrap">
                       R$ {product.price.toFixed(2)}
                     </span>
                   </div>
@@ -155,11 +155,10 @@ export default function RestaurantPage() {
                 <div className="flex justify-end mt-4">
                   <Button
                     size="sm"
-                    className="bg-slate-700 hover:bg-primary text-white"
+                    className="bg-card hover:bg-primary text-foreground"
                     onClick={() => {
                       if (!restaurant) return;
                       addToCart(product, restaurant.id);
-                      alert(`Adicionado: ${product.name}`);
                     }}
                   >
                     <Plus className="w-4 h-4 mr-1" />
