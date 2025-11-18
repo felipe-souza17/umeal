@@ -6,50 +6,50 @@ import { ClientHome } from "@/components/client/client-home";
 import { RestaurantKanban } from "@/components/restaurant/restaurant-kanban";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
+import { apiRequest } from "@/services/api";
+import { translateUserRole } from "@/utils/translate-user-role";
 
 export default function Dashboard() {
   const router = useRouter();
-  const [userRole, setUserRole] = useState<"client" | "restaurant" | null>(
-    null
-  );
+  const [userRole, setUserRole] = useState<
+    "CLIENT" | "RESTAURANT_OWNER" | null
+  >(null);
   const [userName, setUserName] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is logged in
-    const role = localStorage.getItem("userRole") as
-      | "client"
-      | "restaurant"
-      | null;
-    const name =
-      localStorage.getItem("userName") ||
-      localStorage.getItem("userEmail") ||
-      "User";
+    const fetchUserData = async () => {
+      try {
+        const userData = await apiRequest("/users/me");
 
-    if (!role) {
-      router.push("/auth");
-      return;
-    }
+        if (userData && userData.role) {
+          setUserRole(userData.role);
+          setUserName(userData.name);
+        } else {
+          throw new Error("Dados de usuário inválidos");
+        }
+      } catch (error) {
+        console.error("Erro de autenticação:", error);
+        localStorage.removeItem("token");
+        router.push("/");
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    setUserRole(role);
-    setUserName(name);
-    setIsLoading(false);
+    fetchUserData();
   }, [router]);
 
   const handleLogout = () => {
-    localStorage.removeItem("userEmail");
-    localStorage.removeItem("userName");
-    localStorage.removeItem("userRole");
-    router.push("/auth");
+    localStorage.removeItem("token");
+    router.push("/");
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-2">uMeal</h1>
-          <p className="text-slate-400">Loading...</p>
-        </div>
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <p className="text-slate-400">Carregando suas informações...</p>
       </div>
     );
   }
@@ -65,7 +65,7 @@ export default function Dashboard() {
               <div className="text-sm text-slate-400">
                 Welcome,{" "}
                 <span className="text-white font-medium">{userName}</span> (
-                {userRole})
+                {translateUserRole(userRole || "")})
               </div>
             </div>
 
@@ -76,7 +76,7 @@ export default function Dashboard() {
                 onClick={handleLogout}
                 className="text-slate-300"
               >
-                Logout
+                Sair
               </Button>
             </div>
           </div>
@@ -85,7 +85,7 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <main>
-        {userRole === "client" ? <ClientHome /> : <RestaurantKanban />}
+        {userRole === "CLIENT" ? <ClientHome /> : <RestaurantKanban />}
       </main>
     </div>
   );
