@@ -8,12 +8,14 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { apiRequest } from "@/services/api";
 import { translateUserRole } from "@/utils/translate-user-role";
+import { RestaurantSetup } from "@/components/restaurant/restaurant-setup";
 
 export default function Dashboard() {
   const router = useRouter();
   const [userRole, setUserRole] = useState<
     "CLIENT" | "RESTAURANT_OWNER" | null
   >(null);
+  const [restaurantId, setRestaurantId] = useState<string | null>(null);
   const [userName, setUserName] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
@@ -21,9 +23,20 @@ export default function Dashboard() {
     const fetchUserData = async () => {
       try {
         const userData = await apiRequest("/users/me");
+        setUserRole(userData.role);
+
+        if (userData.role === "RESTAURANT_OWNER") {
+          try {
+            const rests = await apiRequest("/restaurants/my-restaurant");
+            if (rests && rests.id) {
+              setRestaurantId(rests.id);
+            }
+          } catch (e) {
+            setRestaurantId(null);
+          }
+        }
 
         if (userData && userData.role) {
-          setUserRole(userData.role);
           setUserName(userData.name);
         } else {
           throw new Error("Dados de usuário inválidos");
@@ -84,8 +97,19 @@ export default function Dashboard() {
       </header>
 
       {/* Main Content */}
-      <main>
-        {userRole === "CLIENT" ? <ClientHome /> : <RestaurantKanban />}
+      <main className="mx-auto  px-4 py-8 sm:px-6 lg:px-8">
+        {userRole === "CLIENT" ? (
+          <ClientHome />
+        ) : (
+          // Lógica do Restaurante
+          <>
+            {!restaurantId ? (
+              <RestaurantSetup onSuccess={() => window.location.reload()} />
+            ) : (
+              <RestaurantKanban restaurantId={restaurantId} />
+            )}
+          </>
+        )}
       </main>
     </div>
   );
