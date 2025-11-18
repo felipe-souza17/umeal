@@ -2,13 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ClientHome } from "@/components/client/client-home";
-import { RestaurantKanban } from "@/components/restaurant/restaurant-kanban";
+
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { apiRequest } from "@/services/api";
 import { translateUserRole } from "@/utils/translate-user-role";
+
+import { ClientHome } from "@/components/client/client-home";
 import { RestaurantSetup } from "@/components/restaurant/restaurant-setup";
+import { RestaurantKanban } from "@/components/restaurant/restaurant-kanban";
+import { RestaurantMenu } from "@/components/restaurant/restaurant-menu";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -96,17 +100,28 @@ export default function Dashboard() {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="mx-auto  px-4 py-8 sm:px-6 lg:px-8">
         {userRole === "CLIENT" ? (
           <ClientHome />
         ) : (
-          // Lógica do Restaurante
           <>
             {!restaurantId ? (
               <RestaurantSetup onSuccess={() => window.location.reload()} />
             ) : (
-              <RestaurantKanban restaurantId={restaurantId} />
+              <Tabs defaultValue="orders" className="w-full space-y-6">
+                <TabsList className="grid w-full max-w-md grid-cols-2 bg-card">
+                  <TabsTrigger value="orders">Pedidos (Kanban)</TabsTrigger>
+                  <TabsTrigger value="menu">Cardápio</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="orders" className="outline-none">
+                  <RestaurantKanban restaurantId={restaurantId} />
+                </TabsContent>
+
+                <TabsContent value="menu" className="outline-none">
+                  <RestaurantMenu restaurantId={restaurantId} />
+                </TabsContent>
+              </Tabs>
             )}
           </>
         )}
