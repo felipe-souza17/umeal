@@ -102,7 +102,7 @@ export default function Dashboard() {
 
       <main className="mx-auto  px-4 py-8 sm:px-6 lg:px-8">
         {userRole === "CLIENT" ? (
-          <ClientHome />
+          <ClientHome userName={userName} />
         ) : (
           <>
             {!restaurantId ? (
