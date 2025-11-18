@@ -16,17 +16,21 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { apiRequest } from "@/services/api";
+import { toast } from "sonner";
 
 export default function Home() {
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState<
     "welcome" | "login" | "signup"
   >("welcome");
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [userType, setUserType] = useState<"client" | "restaurant">("client");
+  const [userType, setUserType] = useState<"CLIENT" | "RESTAURANT">("CLIENT");
+
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -35,27 +39,23 @@ export default function Home() {
     setError("");
     setIsLoading(true);
 
-    if (!email || !password) {
-      setError("Por favor, preencha todos os campos");
-      setIsLoading(false);
-      return;
-    }
+    try {
+      const authData = await apiRequest("/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (!email.includes("@")) {
-      setError("Por favor, insira um endereço de email válido");
-      setIsLoading(false);
-      return;
-    }
+      const token = authData.token;
+      localStorage.setItem("token", token);
 
-    setTimeout(() => {
-      localStorage.setItem("userEmail", email);
-      localStorage.setItem(
-        "userRole",
-        email.includes("restaurant") ? "restaurant" : "client"
-      );
       router.push("/dashboard");
+    } catch (err: any) {
+      setError(
+        err.message || "Falha ao fazer login. Verifique suas credenciais."
+      );
+    } finally {
       setIsLoading(false);
-    }, 500);
+    }
   };
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -68,32 +68,46 @@ export default function Home() {
       setIsLoading(false);
       return;
     }
-
-    if (!email.includes("@")) {
-      setError("Por favor, insira um endereço de email válido");
-      setIsLoading(false);
-      return;
-    }
-
-    if (password.length < 6) {
-      setError("Senha deve ter no mínimo 6 caracteres");
-      setIsLoading(false);
-      return;
-    }
-
     if (password !== confirmPassword) {
       setError("Senhas não correspondem");
       setIsLoading(false);
       return;
     }
-
-    setTimeout(() => {
-      localStorage.setItem("userEmail", email);
-      localStorage.setItem("userName", name);
-      localStorage.setItem("userRole", userType);
-      router.push("/dashboard");
+    if (password.length < 6) {
+      setError("A senha deve ter pelo menos 6 caracteres");
       setIsLoading(false);
-    }, 500);
+      return;
+    }
+
+    try {
+      const endpoint =
+        userType === "CLIENT"
+          ? "/users/register-client"
+          : "/users/register-owner";
+
+      const payload = {
+        name,
+        email,
+        password,
+      };
+
+      await apiRequest(endpoint, {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+
+      toast.success("Conta criada com sucesso! Faça login para continuar.");
+      setCurrentPage("login");
+      setPassword("");
+      setConfirmPassword("");
+    } catch (err: any) {
+      setError(err.message || "Erro ao criar conta. Tente novamente.");
+      toast.error("Falha na Configuração", {
+        description: "Erro ao criar conta. Tente novamente.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (currentPage === "welcome") {
@@ -105,7 +119,7 @@ export default function Home() {
 
         <div className="w-full max-w-md space-y-4">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-primary mb-2">uMeal</h1>
+            <h1 className="text-4xl font-bold text-foreground mb-2">uMeal</h1>
             <p className="text-slate-400">
               Plataforma Premium de Entrega de Alimentos
             </p>
@@ -120,12 +134,10 @@ export default function Home() {
             </CardHeader>
             <CardContent className="space-y-4">
               <Button
-                className="w-full h-12 text-base bg-primary hover:bg-primary/90"
+                className="w-full h-12 text-base bg-primary hover:bg-primary/90 text-foreground"
                 onClick={() => {
                   setCurrentPage("login");
                   setError("");
-                  setEmail("");
-                  setPassword("");
                 }}
               >
                 Entrar
@@ -137,40 +149,12 @@ export default function Home() {
                 onClick={() => {
                   setCurrentPage("signup");
                   setError("");
-                  setName("");
-                  setEmail("");
-                  setPassword("");
-                  setConfirmPassword("");
                 }}
               >
                 Criar Conta
               </Button>
-
-              <div className="pt-4 border-t border-slate-700">
-                <p className="text-sm text-slate-400 mb-3">
-                  Quer explorar primeiro?
-                </p>
-                <Button
-                  variant="ghost"
-                  className="w-full h-10 text-slate-300 hover:bg-slate-700"
-                  onClick={() => router.push("/demo")}
-                >
-                  Experimentar Demo
-                </Button>
-              </div>
             </CardContent>
           </Card>
-
-          <div className="grid grid-cols-2 gap-3 pt-4">
-            <div className="bg-slate-800/50 backdrop-blur p-4 rounded-lg border border-slate-700">
-              <h3 className="font-semibold text-sm mb-1">Para Clientes</h3>
-              <p className="text-xs text-slate-400">Peça de restaurantes</p>
-            </div>
-            <div className="bg-slate-800/50 backdrop-blur p-4 rounded-lg border border-slate-700">
-              <h3 className="font-semibold text-sm mb-1">Para Restaurantes</h3>
-              <p className="text-xs text-slate-400">Gerencie pedidos</p>
-            </div>
-          </div>
         </div>
       </div>
     );
@@ -192,7 +176,7 @@ export default function Home() {
               }}
               className="inline-block mb-4"
             >
-              <h1 className="text-3xl font-bold text-primary hover:opacity-80 transition-opacity">
+              <h1 className="text-3xl font-bold text-foreground hover:opacity-80 transition-opacity">
                 uMeal
               </h1>
             </button>
@@ -213,11 +197,7 @@ export default function Home() {
           )}
 
           <Card className="border-slate-700 bg-slate-800/50 backdrop-blur">
-            <CardHeader>
-              <CardTitle>Bem-vindo de Volta</CardTitle>
-              <CardDescription>Acesse sua conta</CardDescription>
-            </CardHeader>
-            <CardContent>
+            <CardContent className="pt-6">
               <form onSubmit={handleLogin} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
@@ -227,7 +207,7 @@ export default function Home() {
                     placeholder="seu@email.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500"
+                    className="bg-slate-700/50 border-slate-600 text-foreground placeholder:text-slate-500"
                     disabled={isLoading}
                   />
                 </div>
@@ -240,30 +220,18 @@ export default function Home() {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500"
+                    className="bg-slate-700/50 border-slate-600 text-foreground placeholder:text-slate-500"
                     disabled={isLoading}
                   />
                 </div>
 
                 <Button
                   type="submit"
-                  className="w-full h-12 bg-primary hover:bg-primary/90"
+                  className="w-full h-12 bg-primary hover:bg-primary/90 text-foreground"
                   disabled={isLoading}
                 >
                   {isLoading ? "Entrando..." : "Entrar"}
                 </Button>
-
-                <div className="pt-4 border-t border-slate-700">
-                  <p className="text-xs text-slate-400 mb-2">
-                    Credenciais de Demo:
-                  </p>
-                  <p className="text-xs text-slate-300">
-                    Cliente: client@example.com / password
-                  </p>
-                  <p className="text-xs text-slate-300">
-                    Restaurante: restaurant@example.com / password
-                  </p>
-                </div>
               </form>
             </CardContent>
           </Card>
@@ -274,12 +242,8 @@ export default function Home() {
               onClick={() => {
                 setCurrentPage("signup");
                 setError("");
-                setName("");
-                setEmail("");
-                setPassword("");
-                setConfirmPassword("");
               }}
-              className="text-primary hover:underline font-medium"
+              className="text-foreground hover:underline font-medium"
             >
               Criar conta
             </button>
@@ -304,7 +268,7 @@ export default function Home() {
             }}
             className="inline-block mb-4"
           >
-            <h1 className="text-3xl font-bold text-primary hover:opacity-80 transition-opacity">
+            <h1 className="text-3xl font-bold text-foreground hover:opacity-80 transition-opacity">
               uMeal
             </h1>
           </button>
@@ -320,13 +284,7 @@ export default function Home() {
         )}
 
         <Card className="border-slate-700 bg-slate-800/50 backdrop-blur">
-          <CardHeader>
-            <CardTitle>Criar Conta</CardTitle>
-            <CardDescription>
-              Crie sua conta e escolha seu papel
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <form onSubmit={handleSignup} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Nome Completo</Label>
@@ -336,7 +294,7 @@ export default function Home() {
                   placeholder="João Silva"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500"
+                  className="bg-slate-700/50 border-slate-600 text-foreground placeholder:text-slate-500"
                   disabled={isLoading}
                 />
               </div>
@@ -349,7 +307,7 @@ export default function Home() {
                   placeholder="seu@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500"
+                  className="bg-slate-700/50 border-slate-600 text-foreground placeholder:text-slate-500"
                   disabled={isLoading}
                 />
               </div>
@@ -362,7 +320,7 @@ export default function Home() {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500"
+                  className="bg-slate-700/50 border-slate-600 text-foreground placeholder:text-slate-500"
                   disabled={isLoading}
                 />
               </div>
@@ -375,40 +333,52 @@ export default function Home() {
                   placeholder="••••••••"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500"
+                  className="bg-slate-700/50 border-slate-600 text-foreground placeholder:text-slate-500"
                   disabled={isLoading}
                 />
               </div>
 
               <div className="space-y-3 pt-2 border-t border-slate-700">
-                <Label>Sou um</Label>
+                <Label>Quero usar o uMeal como:</Label>
                 <RadioGroup
                   value={userType}
                   onValueChange={(value) =>
-                    setUserType(value as "client" | "restaurant")
+                    setUserType(value as "CLIENT" | "RESTAURANT")
                   }
                 >
-                  <div className="flex items-center space-x-2 p-3 rounded-lg border border-slate-700 hover:bg-slate-700/50 cursor-pointer">
-                    <RadioGroupItem value="client" id="client" />
+                  <div
+                    className={`flex items-center space-x-2 p-3 rounded-lg border cursor-pointer transition-colors ${
+                      userType === "CLIENT"
+                        ? "border-primary bg-primary/10"
+                        : "border-slate-700 hover:bg-slate-700/50"
+                    }`}
+                  >
+                    <RadioGroupItem value="CLIENT" id="client" />
                     <Label
                       htmlFor="client"
                       className="flex-1 cursor-pointer mb-0"
                     >
                       <div className="font-semibold">Cliente</div>
-                      <div className="text-sm text-slate-400">
+                      <div className="text-xs text-slate-400">
                         Peça comida de restaurantes
                       </div>
                     </Label>
                   </div>
-                  <div className="flex items-center space-x-2 p-3 rounded-lg border border-slate-700 hover:bg-slate-700/50 cursor-pointer">
-                    <RadioGroupItem value="restaurant" id="restaurant" />
+                  <div
+                    className={`flex items-center space-x-2 p-3 rounded-lg border cursor-pointer transition-colors ${
+                      userType === "RESTAURANT"
+                        ? "border-primary bg-primary/10"
+                        : "border-slate-700 hover:bg-slate-700/50"
+                    }`}
+                  >
+                    <RadioGroupItem value="RESTAURANT" id="restaurant" />
                     <Label
                       htmlFor="restaurant"
                       className="flex-1 cursor-pointer mb-0"
                     >
-                      <div className="font-semibold">Restaurante</div>
-                      <div className="text-sm text-slate-400">
-                        Gerencie os pedidos do seu restaurante
+                      <div className="font-semibold">Dono de Restaurante</div>
+                      <div className="text-xs text-slate-400">
+                        Gerencie seu restaurante e cardápio
                       </div>
                     </Label>
                   </div>
@@ -417,7 +387,7 @@ export default function Home() {
 
               <Button
                 type="submit"
-                className="w-full h-12 bg-primary hover:bg-primary/90"
+                className="w-full h-12 bg-primary hover:bg-primary/90 text-foreground"
                 disabled={isLoading}
               >
                 {isLoading ? "Criando conta..." : "Criar Conta"}
@@ -432,10 +402,8 @@ export default function Home() {
             onClick={() => {
               setCurrentPage("login");
               setError("");
-              setEmail("");
-              setPassword("");
             }}
-            className="text-primary hover:underline font-medium"
+            className="text-foreground hover:underline font-medium"
           >
             Entrar
           </button>

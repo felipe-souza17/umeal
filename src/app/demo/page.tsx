@@ -17,7 +17,7 @@ export default function DemoPage() {
         <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-8">
-              <h1 className="text-2xl font-bold text-primary">uMeal</h1>
+              <h1 className="text-2xl font-bold text-foreground">uMeal</h1>
               <span className="px-3 py-1 text-sm bg-slate-700/50 text-slate-300 rounded-full">
                 Demo Mode
               </span>
@@ -28,7 +28,7 @@ export default function DemoPage() {
                   onClick={() => setUserRole("client")}
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     userRole === "client"
-                      ? "bg-primary text-primary-foreground"
+                      ? "bg-primary text-foreground-foreground"
                       : "bg-secondary text-secondary-foreground hover:bg-border"
                   }`}
                 >
@@ -38,7 +38,7 @@ export default function DemoPage() {
                   onClick={() => setUserRole("restaurant")}
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     userRole === "restaurant"
-                      ? "bg-primary text-primary-foreground"
+                      ? "bg-primary text-foreground-foreground"
                       : "bg-secondary text-secondary-foreground hover:bg-border"
                   }`}
                 >

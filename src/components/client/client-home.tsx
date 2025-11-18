@@ -1,101 +1,94 @@
-'use client'
+"use client";
 
-import { useState, useMemo } from 'react'
-import { Search, MapPin, Clock, Star } from 'lucide-react'
-import { RestaurantCard } from './restaurant-card'
-import { PromoBanner } from './promo-banner'
+import { useState, useMemo, useEffect } from "react";
+import { Search, MapPin, Clock, Star } from "lucide-react";
+import { Restaurant, RestaurantCard } from "./restaurant-card";
+import { PromoBanner } from "./promo-banner";
+import { Skeleton } from "../ui/skeleton";
+import { apiRequest } from "@/services/api";
 
-const CATEGORIES = ['Pizza', 'Sushi', 'Burgers', 'Thai', 'Chinese', 'Mexican', 'Salads', 'Desserts']
+const CATEGORIES = [
+  { id: 1, name: "Japonesa" },
+  { id: 2, name: "Brasileira" },
+  { id: 3, name: "Pizza" },
+  { id: 4, name: "Hambúrguer" },
+  { id: 5, name: "Italiana" },
+  { id: 6, name: "Árabe" },
+  { id: 7, name: "Chinesa" },
+  { id: 8, name: "Mexicana" },
+  { id: 9, name: "Lanches" },
+  { id: 10, name: "Açaí" },
+  { id: 11, name: "Sobremesas" },
+  { id: 12, name: "Padaria" },
+  { id: 13, name: "Bebidas" },
+  { id: 14, name: "Saudável" },
+  { id: 15, name: "Vegetariana" },
+];
 
-const MOCK_RESTAURANTS = [
-  {
-    id: 1,
-    name: 'Pizzeria Bella',
-    categories: ['Pizza', 'Italian'],
-    image: '/placeholder.svg?height=200&width=400',
-    deliveryTime: '30-45 min',
-    rating: 4.8,
-    reviews: 342,
-    address: '123 Main St, Downtown'
-  },
-  {
-    id: 2,
-    name: 'Sushi Master',
-    categories: ['Sushi', 'Japanese'],
-    image: '/placeholder.svg?height=200&width=400',
-    deliveryTime: '25-35 min',
-    rating: 4.9,
-    reviews: 521,
-    address: '456 Oak Ave, Midtown'
-  },
-  {
-    id: 3,
-    name: 'Burger Haven',
-    categories: ['Burgers', 'American'],
-    image: '/placeholder.svg?height=200&width=400',
-    deliveryTime: '20-30 min',
-    rating: 4.6,
-    reviews: 289,
-    address: '789 Pine St, Downtown'
-  },
-  {
-    id: 4,
-    name: 'Thai Garden',
-    categories: ['Thai', 'Asian'],
-    image: '/placeholder.svg?height=200&width=400',
-    deliveryTime: '35-50 min',
-    rating: 4.7,
-    reviews: 198,
-    address: '321 Elm Rd, Uptown'
-  },
-  {
-    id: 5,
-    name: 'Dragon Wok',
-    categories: ['Chinese', 'Asian'],
-    image: '/placeholder.svg?height=200&width=400',
-    deliveryTime: '30-40 min',
-    rating: 4.5,
-    reviews: 412,
-    address: '654 Maple Dr, East Side'
-  },
-  {
-    id: 6,
-    name: 'Taco Fiesta',
-    categories: ['Mexican', 'Street Food'],
-    image: '/placeholder.svg?height=200&width=400',
-    deliveryTime: '15-25 min',
-    rating: 4.8,
-    reviews: 356,
-    address: '987 Cedar Ln, West Side'
-  }
-]
+export function ClientHome({ userName }: { userName: string }) {
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [filteredRestaurants, setFilteredRestaurants] = useState<Restaurant[]>(
+    []
+  );
+  const [isLoading, setIsLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
-export function ClientHome() {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-  const [searchQuery, setSearchQuery] = useState('')
+  useEffect(() => {
+    const fetchRestaurants = async () => {
+      try {
+        const data = await apiRequest("/restaurants");
+        setRestaurants(data);
+        setFilteredRestaurants(data);
+      } catch (error) {
+        console.error("Erro ao buscar restaurantes", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchRestaurants();
+  }, []);
 
-  const filteredRestaurants = useMemo(() => {
-    return MOCK_RESTAURANTS.filter(restaurant => {
-      const matchesCategory = !selectedCategory || restaurant.categories.includes(selectedCategory)
-      const matchesSearch = restaurant.name.toLowerCase().includes(searchQuery.toLowerCase())
-      return matchesCategory && matchesSearch
-    })
-  }, [selectedCategory, searchQuery])
+  useEffect(() => {
+    let result = restaurants;
+
+    if (searchQuery) {
+      result = result.filter((r) =>
+        r.restaurantName.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    if (activeCategory) {
+      result = result.filter((r) =>
+        r.categories.some((c) => c.name === activeCategory)
+      );
+    }
+
+    setFilteredRestaurants(result);
+  }, [searchQuery, activeCategory, restaurants]);
 
   return (
     <div className="bg-background">
-      {/* Hero Section with Promo */}
-      <PromoBanner />
+      {/* <PromoBanner /> */}
+      <div className="mx-auto max-w-7xl space-y-2">
+        <h2 className="text-3xl font-bold text-foreground transition-colors">
+          Fome de que hoje, {userName}?
+        </h2>
+        <p className="text-slate-400">
+          Encontre os melhores restaurantes perto de você.
+        </p>
+      </div>
 
-      {/* Main Content */}
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        {/* Search Bar */}
         <div className="mb-8">
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
+            <Search
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+              size={20}
+            />
             <input
               type="text"
-              placeholder="Search restaurants..."
+              placeholder="Pesquise por restaurantes ou pratos"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full rounded-xl border border-border bg-card px-4 py-3 pl-12 text-foreground placeholder-muted-foreground transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
@@ -103,54 +96,66 @@ export function ClientHome() {
           </div>
         </div>
 
-        {/* Category Filter */}
         <div className="mb-8">
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             <button
-              onClick={() => setSelectedCategory(null)}
+              onClick={() => setActiveCategory(null)}
               className={`whitespace-nowrap rounded-full px-4 py-2 font-medium transition-colors ${
-                selectedCategory === null
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-card text-foreground border border-border hover:border-primary'
+                activeCategory === null
+                  ? "bg-primary text-foreground-foreground"
+                  : "bg-card text-foreground border border-border hover:border-primary"
               }`}
             >
               All
             </button>
-            {CATEGORIES.map(category => (
+            {CATEGORIES.map((category) => (
               <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
+                key={category.id}
+                onClick={() => setActiveCategory(category.name)}
                 className={`whitespace-nowrap rounded-full px-4 py-2 font-medium transition-colors ${
-                  selectedCategory === category
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-card text-foreground border border-border hover:border-primary'
+                  activeCategory === category.name
+                    ? "bg-primary text-foreground-foreground"
+                    : "bg-card text-foreground border border-border hover:border-primary"
                 }`}
               >
-                {category}
+                {category.name}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Restaurant Grid */}
         <div className="space-y-4">
           <h2 className="text-xl font-semibold text-foreground">
-            {selectedCategory ? `${selectedCategory} Restaurants` : 'Popular Restaurants'}
+            {activeCategory
+              ? `${activeCategory} restaurantes`
+              : "Restaurantes recomendados"}
           </h2>
-          
-          <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-            {filteredRestaurants.map(restaurant => (
-              <RestaurantCard key={restaurant.id} restaurant={restaurant} />
-            ))}
-          </div>
 
-          {filteredRestaurants.length === 0 && (
-            <div className="rounded-xl border border-border bg-card/50 py-12 text-center">
-              <p className="text-muted-foreground">No restaurants found. Try adjusting your search.</p>
+          {isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="space-y-3">
+                  <Skeleton className="h-40 w-full rounded-xl bg-slate-800" />
+                  <Skeleton className="h-4 w-2/3 bg-slate-800" />
+                  <Skeleton className="h-4 w-1/2 bg-slate-800" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredRestaurants.length > 0 ? (
+                filteredRestaurants.map((restaurant) => (
+                  <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+                ))
+              ) : (
+                <div className="col-span-full text-center py-10 text-slate-500">
+                  Nenhum restaurante encontrado
+                </div>
+              )}
             </div>
           )}
         </div>
       </div>
     </div>
-  )
+  );
 }
