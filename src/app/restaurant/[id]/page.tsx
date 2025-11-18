@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star, ChevronLeft, Plus } from "lucide-react";
+import { useCart } from "@/context/cart-context";
+import { CartSidebar } from "@/components/client/cart-sidebar";
 
 interface Product {
   id: number;
@@ -33,6 +35,8 @@ export default function RestaurantPage() {
   const [restaurant, setRestaurant] = useState<RestaurantDetails | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const { addToCart } = useCart();
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -152,6 +156,11 @@ export default function RestaurantPage() {
                   <Button
                     size="sm"
                     className="bg-slate-700 hover:bg-primary text-white"
+                    onClick={() => {
+                      if (!restaurant) return;
+                      addToCart(product, restaurant.id);
+                      alert(`Adicionado: ${product.name}`);
+                    }}
                   >
                     <Plus className="w-4 h-4 mr-1" />
                     Adicionar
@@ -162,6 +171,8 @@ export default function RestaurantPage() {
           ))}
         </div>
       </div>
+
+      <CartSidebar />
     </div>
   );
 }
