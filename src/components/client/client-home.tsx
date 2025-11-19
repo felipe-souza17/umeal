@@ -1,29 +1,12 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
-import { Search, MapPin, Clock, Star } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Loader2, Search } from "lucide-react";
 import { Restaurant, RestaurantCard } from "./restaurant-card";
-import { PromoBanner } from "./promo-banner";
 import { Skeleton } from "../ui/skeleton";
 import { apiRequest } from "@/services/api";
 
-const CATEGORIES = [
-  { id: 1, name: "Japonesa" },
-  { id: 2, name: "Brasileira" },
-  { id: 3, name: "Pizza" },
-  { id: 4, name: "Hambúrguer" },
-  { id: 5, name: "Italiana" },
-  { id: 6, name: "Árabe" },
-  { id: 7, name: "Chinesa" },
-  { id: 8, name: "Mexicana" },
-  { id: 9, name: "Lanches" },
-  { id: 10, name: "Açaí" },
-  { id: 11, name: "Sobremesas" },
-  { id: 12, name: "Padaria" },
-  { id: 13, name: "Bebidas" },
-  { id: 14, name: "Saudável" },
-  { id: 15, name: "Vegetariana" },
-];
+import { useCategories } from "@/hooks/use-categories";
 
 export function ClientHome({ userName }: { userName: string }) {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
@@ -33,6 +16,8 @@ export function ClientHome({ userName }: { userName: string }) {
   const [isLoading, setIsLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+
+  const { categories, isLoading: isLoadingCategories } = useCategories();
 
   useEffect(() => {
     const fetchRestaurants = async () => {
@@ -106,21 +91,27 @@ export function ClientHome({ userName }: { userName: string }) {
                   : "bg-card text-foreground border border-border hover:border-primary"
               }`}
             >
-              All
+              Todos
             </button>
-            {CATEGORIES.map((category) => (
-              <button
-                key={category.id}
-                onClick={() => setActiveCategory(category.name)}
-                className={`whitespace-nowrap rounded-full px-4 py-2 font-medium transition-colors ${
-                  activeCategory === category.name
-                    ? "bg-primary text-foreground-foreground"
-                    : "bg-card text-foreground border border-border hover:border-primary"
-                }`}
-              >
-                {category.name}
-              </button>
-            ))}
+            {isLoadingCategories ? (
+              <span className="text-sm text-muted-foreground p-2">
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              </span>
+            ) : (
+              categories.map((category) => (
+                <button
+                  key={category.id}
+                  onClick={() => setActiveCategory(category.name)}
+                  className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                    activeCategory === category.name
+                      ? "bg-primary text-white"
+                      : "bg-card text-foreground border border-border hover:border-primary"
+                  }`}
+                >
+                  {category.name}
+                </button>
+              ))
+            )}
           </div>
         </div>
 

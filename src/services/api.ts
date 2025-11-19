@@ -1,13 +1,17 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export async function apiRequest(endpoint: string, options: RequestInit = {}) {
+export async function apiRequest(
+  endpoint: string,
+  options: RequestInit = {},
+  needAuth = true
+) {
   const headers = {
     "Content-Type": "application/json",
     ...options.headers,
   } as HeadersInit;
 
   const token = localStorage.getItem("token");
-  if (token) {
+  if (token && needAuth) {
     (headers as any)["Authorization"] = `Bearer ${token}`;
   }
 
