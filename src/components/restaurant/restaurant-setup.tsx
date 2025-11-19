@@ -23,23 +23,7 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { AddressFormWithMap } from "../common/address-form-with-map";
 
-const CATEGORIES = [
-  { id: 1, name: "Japonesa" },
-  { id: 2, name: "Brasileira" },
-  { id: 3, name: "Pizza" },
-  { id: 4, name: "Hambúrguer" },
-  { id: 5, name: "Italiana" },
-  { id: 6, name: "Árabe" },
-  { id: 7, name: "Chinesa" },
-  { id: 8, name: "Mexicana" },
-  { id: 9, name: "Lanches" },
-  { id: 10, name: "Açaí" },
-  { id: 11, name: "Sobremesas" },
-  { id: 12, name: "Padaria" },
-  { id: 13, name: "Bebidas" },
-  { id: 14, name: "Saudável" },
-  { id: 15, name: "Vegetariana" },
-];
+import { useCategories } from "@/hooks/use-categories";
 
 interface RestaurantSetupProps {
   onSuccess: () => void;
@@ -47,6 +31,10 @@ interface RestaurantSetupProps {
 
 export function RestaurantSetup({ onSuccess }: RestaurantSetupProps) {
   const [isLoading, setIsLoading] = useState(false);
+
+  const { categories, isLoading: isLoadingCategories } = useCategories();
+
+  const isFormLoading = isLoading || isLoadingCategories;
 
   const [name, setName] = useState("");
   const [cnpj, setCnpj] = useState("");
@@ -156,7 +144,7 @@ export function RestaurantSetup({ onSuccess }: RestaurantSetupProps) {
                       <SelectValue placeholder="Selecione o tipo de comida" />
                     </SelectTrigger>
                     <SelectContent>
-                      {CATEGORIES.map((cat) => (
+                      {categories.map((cat) => (
                         <SelectItem key={cat.id} value={cat.id.toString()}>
                           {cat.name}
                         </SelectItem>
@@ -177,15 +165,6 @@ export function RestaurantSetup({ onSuccess }: RestaurantSetupProps) {
                 onSuccess={handleAddressData}
                 isRestaurantSetup={true}
               />
-
-              {/* Exibição rápida da Lat/Lng capturada */}
-              {addressPayload && (
-                <p className="text-xs text-muted-foreground mt-2">
-                  Coordenadas capturadas: Lat:{" "}
-                  {addressPayload.latitude.toFixed(6)}, Lng:{" "}
-                  {addressPayload.longitude.toFixed(6)}
-                </p>
-              )}
             </div>
 
             <Button

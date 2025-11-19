@@ -25,24 +25,7 @@ import { apiRequest } from "@/services/api";
 import { Plus, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-// Reutilizando as mesmas categorias (idealmente viriam do banco/constante compartilhada)
-const CATEGORIES = [
-  { id: 1, name: "Japonesa" },
-  { id: 2, name: "Brasileira" },
-  { id: 3, name: "Pizza" },
-  { id: 4, name: "Hambúrguer" },
-  { id: 5, name: "Italiana" },
-  { id: 6, name: "Árabe" },
-  { id: 7, name: "Chinesa" },
-  { id: 8, name: "Mexicana" },
-  { id: 9, name: "Lanches" },
-  { id: 10, name: "Açaí" },
-  { id: 11, name: "Sobremesas" },
-  { id: 12, name: "Padaria" },
-  { id: 13, name: "Bebidas" },
-  { id: 14, name: "Saudável" },
-  { id: 15, name: "Vegetariana" },
-];
+import { useCategories } from "@/hooks/use-categories";
 
 interface ProductDialogProps {
   restaurantId: string;
@@ -57,6 +40,8 @@ export function ProductDialog({ restaurantId, onSuccess }: ProductDialogProps) {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [categoryId, setCategoryId] = useState("");
+
+  const { categories, isLoading: isLoadingCategories } = useCategories();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -146,10 +131,12 @@ export function ProductDialog({ restaurantId, onSuccess }: ProductDialogProps) {
               <Label>Categoria</Label>
               <Select onValueChange={setCategoryId} required>
                 <SelectTrigger className="bg-slate-900/50 border-slate-600">
-                  <SelectValue placeholder="Tipo" />
+                  <SelectValue
+                    placeholder={isLoadingCategories ? "Carregando..." : "Tipo"}
+                  />
                 </SelectTrigger>
                 <SelectContent>
-                  {CATEGORIES.map((cat) => (
+                  {categories.map((cat) => (
                     <SelectItem key={cat.id} value={cat.id.toString()}>
                       {cat.name}
                     </SelectItem>

@@ -76,6 +76,19 @@ export function AddressFormWithMap({
       if (coords) {
         setCenter(coords);
         setMarkerPosition(coords);
+        if (isRestaurantSetup) {
+          const payload = {
+            street: cepData.logradouro || "",
+            number: number,
+            neighborhood: cepData.bairro || "",
+            city: cepData.localidade || "",
+            state: cepData.uf || "",
+            zipCode: cleanZipCode,
+            latitude: coords.lat,
+            longitude: coords.lng,
+          };
+          onSuccess(payload);
+        }
       }
     } catch (error) {
       toast.error("Busca falhou", {
@@ -83,6 +96,24 @@ export function AddressFormWithMap({
       });
     } finally {
       setIsGeocoding(false);
+    }
+  };
+
+  const handleDragEnd = (newPosition: google.maps.LatLngLiteral) => {
+    setMarkerPosition(newPosition);
+
+    if (isRestaurantSetup) {
+      const payload = {
+        street,
+        number,
+        neighborhood,
+        city,
+        state,
+        zipCode: zipCode.replace(/\D/g, ""),
+        latitude: newPosition.lat,
+        longitude: newPosition.lng,
+      };
+      onSuccess(payload);
     }
   };
 
@@ -175,11 +206,7 @@ export function AddressFormWithMap({
           draggable={true}
           onDragEnd={(e) => {
             if (e.latLng) {
-              setMarkerPosition({ lat: e.latLng.lat(), lng: e.latLng.lng() });
-              toast.info("Localização Fixada!", {
-                description: "Latitude e Longitude salvas.",
-                duration: 1500,
-              });
+              handleDragEnd({ lat: e.latLng.lat(), lng: e.latLng.lng() });
             }
           }}
           icon={{
