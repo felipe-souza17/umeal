@@ -14,6 +14,7 @@ import { RestaurantKanban } from "@/components/restaurant/restaurant-kanban";
 import { RestaurantMenu } from "@/components/restaurant/restaurant-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { OrderHistory } from "@/components/client/order-history";
+import { CartSidebar } from "@/components/client/cart-sidebar";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -152,6 +153,8 @@ export default function Dashboard() {
           </>
         )}
       </main>
+
+      {userRole === "CLIENT" && <CartSidebar />}
     </div>
   );
 }

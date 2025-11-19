@@ -89,6 +89,8 @@ export function CartSidebar() {
     }
   };
 
+  if (cartCount === 0) return;
+
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
