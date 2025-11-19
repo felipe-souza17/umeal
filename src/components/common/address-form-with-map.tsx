@@ -21,13 +21,15 @@ const libraries: ("places" | "geometry" | "drawing" | "visualization")[] = [
 ];
 
 interface AddressFormProps {
-  onSuccess: () => void;
+  onSuccess: (data?: any) => void;
   initialAddress?: any;
+  isRestaurantSetup?: boolean;
 }
 
 export function AddressFormWithMap({
   onSuccess,
   initialAddress,
+  isRestaurantSetup,
 }: AddressFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isGeocoding, setIsGeocoding] = useState(false);
@@ -113,6 +115,11 @@ export function AddressFormWithMap({
         latitude: markerPosition.lat,
         longitude: markerPosition.lng,
       };
+
+      if (isRestaurantSetup) {
+        onSuccess(payload);
+        return;
+      }
 
       const endpoint = initialAddress
         ? `/addresses/${initialAddress.id}`
@@ -284,17 +291,19 @@ export function AddressFormWithMap({
         </div>
       </div>
 
-      <Button
-        type="submit"
-        className="w-full bg-primary hover:bg-primary/90 text-white h-12 font-bold"
-        disabled={isLoading || isGeocoding || !markerPosition}
-      >
-        {isLoading ? (
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-        ) : (
-          "Salvar Localização"
-        )}
-      </Button>
+      {!isRestaurantSetup && (
+        <Button
+          type="submit"
+          className="w-full bg-primary hover:bg-primary/90 text-white h-12 font-bold"
+          disabled={isLoading || isGeocoding || !markerPosition}
+        >
+          {isLoading ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            "Salvar Localização"
+          )}
+        </Button>
+      )}
     </form>
   );
 }
