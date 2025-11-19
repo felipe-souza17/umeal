@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Loader2, Trash2, Edit2, Plus, MapPin } from "lucide-react";
+import { AddressDialog } from "../common/address-dialog";
 
 interface UserData {
   name: string;
@@ -130,18 +131,8 @@ export function ClientSettings() {
       <Card className="bg-card border-border">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Meus Endereços</CardTitle>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() =>
-              toast.info(
-                "Funcionalidade futura: Abrir modal de cadastro de endereço."
-              )
-            }
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Novo Endereço
-          </Button>
+
+          <AddressDialog onAddressSaved={fetchUserData} />
         </CardHeader>
         <CardContent className="space-y-3">
           {addresses.length === 0 ? (
@@ -162,18 +153,11 @@ export function ClientSettings() {
                   - {addr.neighborhood}, {addr.city}/{addr.state}
                 </p>
                 <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-primary hover:bg-primary/10"
-                    onClick={() =>
-                      toast.info(
-                        "Funcionalidade futura: Abrir modal de edição."
-                      )
-                    }
-                  >
-                    <Edit2 className="h-4 w-4" />
-                  </Button>
+                  <AddressDialog
+                    onAddressSaved={fetchUserData}
+                    initialAddress={addr}
+                  />
+
                   <Button
                     variant="ghost"
                     size="icon"
