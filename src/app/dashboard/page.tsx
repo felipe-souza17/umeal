@@ -15,6 +15,7 @@ import { RestaurantMenu } from "@/components/restaurant/restaurant-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { OrderHistory } from "@/components/client/order-history";
 import { CartSidebar } from "@/components/client/cart-sidebar";
+import { ClientSettings } from "@/components/client/settings";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -107,7 +108,7 @@ export default function Dashboard() {
       <main className="mx-auto  px-4 py-8 sm:px-6 lg:px-8">
         {userRole === "CLIENT" ? (
           <Tabs defaultValue="home" className="mx-auto max-w-7xl space-y-6">
-            <TabsList className="grid w-full max-w-lg grid-cols-2 bg-card">
+            <TabsList className="grid w-full max-w-lg grid-cols-3 bg-card">
               <TabsTrigger
                 value="home"
                 className="text-foreground data-[state=active]:bg-primary data-[state=active]:text-white"
@@ -120,6 +121,12 @@ export default function Dashboard() {
               >
                 Meus Pedidos
               </TabsTrigger>
+              <TabsTrigger
+                value="settings"
+                className="text-foreground data-[state=active]:bg-primary data-[state=active]:text-white"
+              >
+                Configurações
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="home" className="outline-none">
@@ -128,6 +135,10 @@ export default function Dashboard() {
 
             <TabsContent value="orders" className="outline-none">
               <OrderHistory />
+            </TabsContent>
+
+            <TabsContent value="settings" className="outline-none">
+              <ClientSettings />
             </TabsContent>
           </Tabs>
         ) : (
